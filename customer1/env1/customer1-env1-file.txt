@@ -1,3 +1,1 @@
 I am customer1-env-1 file 
-new variable
-new feature
