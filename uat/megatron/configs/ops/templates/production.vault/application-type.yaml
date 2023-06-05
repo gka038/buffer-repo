@@ -1,0 +1,19 @@
+
+version: 1.0
+kind: application-type
+application-type:
+  - type: frontend
+    engine: application
+    tiers:
+      - reference: "XL"
+        cpu_limit: 128
+        memory_limit: 512
+        desired_count: 1
+      - reference: "M"
+        cpu_limit: 300
+        memory_limit: 512
+        desired_count: 1
+      - reference: "XS"
+        cpu_limit: 128
+        memory_limit: 512
+        desired_count: 1

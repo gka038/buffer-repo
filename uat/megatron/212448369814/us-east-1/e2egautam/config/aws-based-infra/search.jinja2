@@ -1,0 +1,19 @@
+locals {
+  settings = {
+    service                   = "{{ service | default('opensearch', true) }}" # "opensearch" or "elasticsearch"
+    storage_size              = {{ storage_size | default(35, true) }}
+    volume_type               = "{{ volume_type | default('gp3', true) }}" # EBS volume type, gp2 or gp3
+    encrypt                   = {{ encrypt | default(false, true) | lower }} # Enable encryption at rest for ElasticSearch (only specific instance family types support it: m4, c4, r4, i2, i3 default: false)
+    version                   = "{{ version | default("OpenSearch_1.3", true) }}" # Maintainable versions: "7.7", "7.10" for ES and "OpenSearch_1.2", "OpenSearch_1.3" for OpenSearch. Elasticsearch versions without prefix, OpenSearch versions must be prefixed with "OpenSearch_".
+    instance_size             = "{{ instance_size | default("t3.medium.search", true) }}" #"t3.medium.elasticsearch" for Elasticsearch. Must be "*.search" for OpenSearch or "*.elasticsearch" for ES
+    dedicated_master_type     = "{{ dedicated_master_type | default("t3.medium.search", true) }}" #"t3.medium.elasticsearch" for Elasticsearch. Must be "*.search" for OpenSearch or "*.elasticsearch" for ES
+    port                      = {{ port | default(80, true) }}
+    logs_expire               = {{ logs_expire | default(7, true) }}
+    production_mode           = {{ production_mode | default(false, true) | lower }}
+    data_nodes_count          = {{ data_nodes_count | default(1, true) | lower }}
+    master_nodes_count        = {{ master_nodes_count | default(0, true) | lower }}
+    advanced_security_options = {
+      enabled = {{ advanced_security_enabled | default(false, true) | lower }}
+    }
+  }
+}

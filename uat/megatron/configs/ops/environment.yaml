@@ -1,0 +1,7 @@
+kind: environment
+environment:
+  - reference: "e2egautam"
+    environment_template: "production.vault"
+    tier: M
+    landing_zone: "e2egautam"
+    tags: [ "production", "us", "wave3", "wave4" ]
