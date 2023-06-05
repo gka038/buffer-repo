@@ -1,0 +1,97 @@
+---
+- name: Display extracted names
+  debug:
+    msg: "customer_name: {{ customer_name }}, customer_project: {{ customer_project }}, environment_name: {{ environment_name }}"
+
+- name: Set enc_passwd variable
+  set_fact:
+    enc_passwd: "{{ inventory_hostname }}-enc-pass"
+    env_name: "{{ customer_name  }}"
+    env_project: "{{ customer_project }}"
+    env_type: "{{ environment_name }}"
+
+- debug:
+    msg: "🔍️ DEBUG: customer's folder name: {{ inventory_hostname }}"
+
+- debug:
+    msg: "🔍️ DEBUG: ansible folder: {{playbook_dir}}/../../{{ env_name }}/{{ env_project }}/ansible/{{ env_type }}"
+
+- name: Check secrets.auto.tfvars file
+  local_action:
+    module: stat
+    path: "{{playbook_dir}}/../../{{ env_name }}/{{ env_type }}/secrets.auto.tfvars"
+  register: secrets_file
+  when: ansible_config.vault_pass is not defined
+
+- name: Get ansible vault encryption password from the secrets.auto.tfvars
+  local_action:
+    module: shell
+    cmd: "awk -F'=' '/ssm_ansible_password/ {gsub(/\"/, \"\"); gsub(/ /, \"\"); print $2}' secrets.auto.tfvars"
+    chdir: "{{playbook_dir}}/../../{{ env_name }}/{{ env_type }}"
+  register: vault_pass
+  when:
+    - ansible_config.vault_pass is not defined
+    - secrets_file.stat.exists
+
+- name: Exit if password isn't set
+  fail:
+    msg:
+      - "Can't open secrets file: {{playbook_dir}}/../../{{ env_name }}/{{ env_type }}/secrets.auto.tfvars"
+      - "Please set ssm_ansible_password in secrets.auto.tfvars or create ec2/ansible-config/<ENV_NAME>/vault_pass secret"
+  when:
+    - ansible_config.vault_pass is not defined
+    - vault_pass.skipped is defined
+
+- name: Set ansible vault encryption password
+  set_fact:
+    ansible_encryption_password: "{{ansible_config['vault_pass']| default(vault_pass.stdout)}}"
+
+- name: Prepare users key list
+  set_fact:
+    ssh_users_keys: |
+      {% set res = [] -%}
+        {% for host_name in ssh_list -%}
+          {% for host_user_name in host_name -%}
+            {% for user_name in host_name[host_user_name]| replace(' ', '')| split(',') -%}
+              {% set ignored = res.extend([{ "user_key": ssh_keys_list[user_name], "host_user": host_user_name }]) -%}
+            {%- endfor %}
+          {%- endfor %}
+        {%- endfor %}
+      {{ res }}
+
+- name: Create an ansible directory
+  local_action:
+    module: file
+    path: "{{playbook_dir}}/../../{{ env_name }}/{{ env_project }}/ansible/{{ env_type }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy templated playbooks
+  local_action:
+    module: copy
+    src: "templates/{{ item }}"
+    dest: "{{playbook_dir}}/../../{{ env_name }}/{{ env_project }}/ansible/{{ env_type }}/{{ item }}"
+  with_items: "{{ ansible_playbooks }}"
+
+- name: Create a temporary local passwd file
+  local_action:
+    module: copy
+    content: "{{inventory_hostname}} {{ansible_encryption_password}}"
+    dest: "{{ inventory_hostname }}-tmp.pass"
+
+- name: Copy ssh keys file
+  local_action:
+    module: copy
+    content: "ssh_users_keys: {{ ssh_users_keys }}"
+    dest: "{{playbook_dir}}/../../{{ env_name }}/{{ env_project }}/ansible/{{ env_type }}/ssh_keys.yml"
+
+- name: Encrypt ssh keys file
+  local_action:
+    module: shell
+    cmd:  ansible-vault encrypt --vault-id "{{ inventory_hostname }}@{{ inventory_hostname }}-tmp.pass"  "{{ playbook_dir }}/../../{{ env_name }}/{{ env_project }}/ansible/{{ env_type }}/ssh_keys.yml"
+
+- name: Remove the temporary local passwd file
+  local_action:
+    module: file
+    path: "{{ inventory_hostname }}-tmp.pass"
+    state: absent

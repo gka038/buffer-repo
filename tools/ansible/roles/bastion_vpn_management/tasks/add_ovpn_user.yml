@@ -1,0 +1,22 @@
+---
+- name: Create server tmp directory if it does not exist
+  file:
+    path: "/tmp/{{ server_tmp_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Check if user vpn alredy exists
+  stat:
+    path: "{{ EASYRSA_PKI }}/issued/{{ item }}.crt"
+  register: vpn_certs_check
+  loop: "{{ vpn_users }}"
+  become: yes
+
+- set_fact:
+    vpn_certs_check: "{{ vpn_certs_check }}"
+
+- name: Adding OVPN users
+  command: "{{ script_folder }}/{{script_name}} {{ item.item }}"
+  when: item.stat.exists == false
+  loop: "{{ vpn_certs_check.results }}"
+  become: yes

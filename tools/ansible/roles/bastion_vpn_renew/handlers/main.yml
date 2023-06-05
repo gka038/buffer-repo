@@ -1,0 +1,10 @@
+---
+- name: Restart OVPN
+  ansible.builtin.service:
+    name: openvpn
+    state: restarted
+  become: yes
+
+- name: Restart OVPN srv
+  shell: systemctl restart openvpn-server@server
+  become: yes

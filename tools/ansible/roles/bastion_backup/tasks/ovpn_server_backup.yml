@@ -1,0 +1,6 @@
+---
+- name: Archive OVPN directories
+  archive:
+    path: "{{ openvpn_dirs }}"
+    dest: "/tmp/{{ backup_dir }}/OVPN.tar.gz"
+    format: gz

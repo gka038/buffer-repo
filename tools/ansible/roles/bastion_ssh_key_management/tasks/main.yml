@@ -1,0 +1,6 @@
+---
+- include: add_ssh_keys.yml
+  become: yes
+
+- include: revoke_ssh_keys.yml
+  become: yes

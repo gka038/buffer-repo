@@ -1,0 +1,15 @@
+---
+- hosts: all
+  vars_files:
+    - ssh_keys.yml
+  vars:
+    ssh_users:
+      - "ubuntu"
+      - "spryker-admin"
+      - "ec2-user"
+
+  tasks:
+    - name: Include add_ssh_keys
+      include:  add_ssh_keys.yml
+    - name: Include revoke_ssh_keys
+      include:  revoke_ssh_keys.yml

@@ -1,0 +1,16 @@
+---
+- name: Set current date/time
+  set_fact:
+    current_date: "{{ '%d-%m-%Y_%H-%M' | strftime }}"
+
+- include: ssh_keys_backup.yml
+  become: yes
+
+- include: ovpn_server_backup.yml
+  become: yes
+
+- include: download_archive.yml
+  become: yes
+
+- include: clean_up.yml
+  become: yes

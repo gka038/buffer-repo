@@ -1,0 +1,35 @@
+---
+- name: Get bastion config from the vault
+  set_fact:
+    bastions_list_1: "{{ lookup('hashi_vault', 'return_format=values secret=cloud/data/bastion/vpn/' + 'shared_list')  | default({}) }},
+                    {{ lookup('hashi_vault', 'return_format=values secret=cloud/data/bastion/vpn/' + inventory_hostname, errors='warn') | default({}) }}"
+
+- name: Get jenkins domain name
+  set_fact:
+    jenksin_domain: "{{ lookup('hashi_vault', 'secret=openvpn-ip/data/bastions/' + inventory_hostname, errors='warn')['jenkins-host'] | default('no-config', true)}}"
+
+- fail: msg="jenksin_domain variable not defined in vault"
+  when: jenksin_domain == "no-config"
+
+- name: Get jenkins admin user
+  set_fact:
+    jenksin_admin_user: "{{ lookup('hashi_vault', 'secret=openvpn-ip/data/bastions/' + inventory_hostname, errors='warn')['jenkins-admin-user'] | default('no-config', true)}}"
+
+- fail: msg="jenksin_admin_user variable not defined in vault"
+  when: jenksin_admin_user == "no-config"
+
+- name: Get jenkins admin password
+  set_fact:
+    jenksin_admin_pass: "{{ lookup('hashi_vault', 'secret=openvpn-ip/data/bastions/' + inventory_hostname, errors='warn')['jenkins-admin-pass'] | default('no-config', true)}}"
+
+- fail: msg="jenksin_admin_pass variable not defined in vault"
+  when: jenksin_admin_pass == "no-config"
+
+- name: Create jenkins users list
+  set_fact:
+    jenkins_users: "{{ bastions_list_1| replace(' ', '') | split(',') | select() | unique }}"
+
+- name: Get jenkins users emails
+  set_fact:
+    jenkins_users_emails: "{{ jenkins_users_emails| default({})| combine ({ item: lookup('hashi_vault', 'secret=cloud/data/users/' + item )['email']} | default({})) }}"
+  with_items: "{{ jenkins_users }}"

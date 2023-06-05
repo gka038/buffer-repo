@@ -1,0 +1,6 @@
+---
+- include: add_jenkins_user.yml
+  become: yes
+
+- include: revoke_jenkins_users.yml
+  become: yes

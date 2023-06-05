@@ -1,0 +1,10 @@
+---
+- name: Get existing users
+  shell: ls -1 /home/spryker-admin/jenkins | sed -e 's/\.txt$//'
+  register: jenkins_users_list
+
+- name: Remove Jenkins users
+  ansible.builtin.shell: | 
+      curl -vvv -u "{{ jenksin_admin_user }}:{{ jenksin_admin_pass }}" -o /dev/null -d Submit=Yes http://{{ jenksin_domain }}/securityRealm/user/{{ item | replace('.','_') }}/doDelete
+  loop: "{{jenkins_users_list.stdout_lines}}"
+  when: item.replace('_','.') not in jenkins_users

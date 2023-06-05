@@ -1,0 +1,6 @@
+---
+- name: Install vpn_add_user.sh
+  template:
+    src: templates/vpn_add_user_script.j2
+    dest: "{{ script_folder }}{{ script_name }}"
+    mode: '0755'

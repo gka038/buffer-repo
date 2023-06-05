@@ -1,0 +1,53 @@
+---
+- name: Check if user passwrd alredy exists
+  stat:
+    path: "/home/spryker-admin/jenkins/{{ item | replace('.','_') }}.txt"
+  register: jenkins_users_check
+  loop: "{{ jenkins_users }}"
+  become: yes
+
+- set_fact:
+    jenkins_users_check: "{{ jenkins_users_check }}"
+
+- set_fact:
+    jenkins_users_check: "{{ jenkins_users_check }}"
+
+# - name: Enable Jenkins Auth and add the first user 
+#   ansible.builtin.shell: |   
+#       curl -vvv -o /dev/null -d json="{\"securityRealm\":{\"allowsSignup\":false,\"stapler-class\":\"hudson.security.HudsonPrivateSecurityRealm\",\"$class\":\"hudson.security.HudsonPrivateSecurityRealm\"},\"core:apply\":\"true\"}" http://{{ jenksin_domain }}/configureSecurity/configure
+#       curl -vvv -o /dev/null -d username={{ jenksin_admin_user }} -d password1={{ jenksin_admin_pass }} -d password2={{ jenksin_admin_pass }} -d fullname=Spryker-Admin -d Submit=Create+First+Admin+User http://{{ jenksin_domain }}/securityRealm/createFirstAccount
+#   become: yes
+
+- name: Create jenkins directory if not exists
+  ansible.builtin.file:
+    path: /home/spryker-admin/jenkins/
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Adding Jenkins users
+  ansible.builtin.shell: | 
+      temp=$(openssl rand -base64 12)
+      PASS=$(echo $temp | sed 's/[^a-zA-Z0-9]//g')
+      echo "UserName: "{{ item.item | replace('.','_') }}  >> "/home/spryker-admin/jenkins/{{ item.item | replace('.','_') }}.txt"
+      echo "Password: "$PASS >> "/home/spryker-admin/jenkins/{{ item.item | replace('.','_') }}.txt"
+      CRUMB=$(curl -u {{ jenksin_admin_user }}:{{ jenksin_admin_pass }} --cookie-jar "/tmp/cookie" "http://{{ jenksin_domain }}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)")
+      curl -vvv -u {{ jenksin_admin_user }}:{{ jenksin_admin_pass }} --cookie "/tmp/cookie" -H "$CRUMB" "http://{{ jenksin_domain }}/securityRealm/createAccountByAdmin"  -d username={{ item.item | replace('.','_') }} -d password1=$PASS -d password2=$PASS -d fullname={{ item.item | replace('.','_') }} 
+  when: item.stat.exists == false
+  loop: "{{ jenkins_users_check.results }}"
+  become: yes
+
+- name: Create jenkins tmp directory if not exists
+  ansible.builtin.file:
+    path: /tmp/jenkins-auth/
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Archive user password text file 
+  ansible.builtin.shell: | 
+      cd /home/spryker-admin/jenkins/ 
+      tar -cvzf /tmp/jenkins-auth/{{ inventory_hostname }}_{{ item.item | replace('.','_') }}.tar.gz {{ item.item | replace('.','_') }}.txt
+  when: item.stat.exists == false
+  loop: "{{ jenkins_users_check.results }}"
+  become: yes

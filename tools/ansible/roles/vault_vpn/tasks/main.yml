@@ -1,0 +1,3 @@
+---
+- include: vault_vpn.yml
+  when: vault_folder != "ec2"

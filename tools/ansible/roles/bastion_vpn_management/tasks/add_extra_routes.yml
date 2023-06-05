@@ -1,0 +1,25 @@
+---
+- name: Add an extra routes to subnets
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server/server.conf
+    regexp: '^push "route 10.72.{{ item }}.0 '
+    insertbefore: '^;push "dhcp-option DNS <VPC DNS server>"'
+    line: 'push "route 10.72.{{ item }}.0 255.255.254.0"'
+  with_items: "{{ subnets }}"
+  notify:
+    - Restart OVPN srv
+  become: yes
+
+- name: Add an extra rules to NAT
+  ansible.builtin.lineinfile:
+    path: /etc/iptables/rules.v4
+    regexp: '^-A POSTROUTING -s 10.8.0.0/24 -d 10.72.{{ item }}.0/23 '
+    insertbefore: '^:POSTROUTING ACCEPT'
+    line: '-A POSTROUTING -s 10.8.0.0/24 -d 10.72.{{ item }}.0/23 -j MASQUERADE'
+  register: nat_conf
+  with_items: "{{ subnets }}"
+
+- name: Apply iptables rule
+  shell: "iptables-restore < /etc/iptables/rules.v4"
+  when: nat_conf.changed == true
+  become: yes

@@ -1,0 +1,37 @@
+#  Local .terraform directories and files
+**/.terraform/*
+**/.terragrunt-cache/*
+*.terraform.lock.hcl
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars
+
+*out.terraform*
+
+# OSX
+.DS_Store
+
+# JetBrains
+.idea/*
+*.iws
+*.iml
+*.ipr
+
+#VS Code
+.vscode
+
+# AWS credentials
+credentials.aws
+
+**/*lambda.zip
+*.zip
+!confd.zip
+
+**/__pycache__/*
+
+node_modules
+package-lock.json

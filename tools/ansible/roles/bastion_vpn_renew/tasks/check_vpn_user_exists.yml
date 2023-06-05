@@ -1,0 +1,21 @@
+---
+- name: Create vpn users list
+  set_fact:
+    vpn_users: "{{ VPN_RENEW | replace(' ', '') | split(',') | select() | unique }}"
+  when: VPN_RENEW is defined
+
+- name: Get users emails
+  set_fact:
+    users_emails: "{{ users_emails| default({})| combine ({ item: lookup('hashi_vault', secret='cloud/data/users/' + item )['email']} | default({})) }}"
+  with_items: "{{ vpn_users }}"
+  when: VPN_RENEW is defined
+
+- name: Check if user certificate already exists
+  stat:
+    path: "{{ EASYRSA_PKI }}/issued/{{ item }}.crt"
+  register: vpn_certs_check_init
+  loop: "{{ vpn_users }}"
+
+- name: Get installed certificates
+  shell: grep ^V /root/pki/index.txt | awk -F '=' '{print $2}' | grep -v 'server'
+  register: vpn_users_list

@@ -1,0 +1,18 @@
+---
+- hosts: bastion
+  vars:
+    vault_folder: "bastion"
+  roles:
+    - role: bastion_backup
+      tags: backup
+    - role: vault_ssh
+      tags: ssh
+    - role: bastion_ssh_key_management
+      tags: ssh
+    - role: vault_vpn
+      tags: vpn
+    - role: bastion_vpn_management
+      tags: vpn
+    - role: send_email
+      tags: vpn
+    # TODO: bastion restore

@@ -1,0 +1,24 @@
+---
+- name: Check if user authorized_keys exists
+  stat:
+    path: "/home/{{ item }}/.ssh/authorized_keys"
+  register: keys_output
+  with_items:
+    - "{{ ssh_users }}"
+
+- name: Create server backup directory if it does not exist
+  file:
+    path: "/tmp/{{ backup_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy SSH keys
+  copy:
+    src: "/home/{{ item.item }}/.ssh/authorized_keys"
+    dest: "/tmp/{{ backup_dir }}/{{ item.item }}_authorized_keys"
+    remote_src: yes
+  when: item.stat.exists == true
+  loop: "{{ keys_output.results }}"
+  become: yes
+
+

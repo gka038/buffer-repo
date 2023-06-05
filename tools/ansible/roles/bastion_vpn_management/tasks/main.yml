@@ -1,0 +1,39 @@
+---
+- include: script_redeploy.yml
+  become: yes
+  when: vpn_script_update| bool
+
+- name: Check if script exists
+  stat:
+    path: "{{ script_folder }}/{{ script_name }}"
+  register: script
+
+- include: script_install.yml
+  become: yes
+  when: script.stat.exists == false
+
+- include: add_ovpn_user.yml
+  become: yes
+
+- include: revoke_ovpn_users.yml
+  become: yes
+
+- include: add_extra_routes.yml
+  vars:
+    subnets:
+      - 240
+      - 246
+      - 248
+  become: yes
+  when: inventory_hostname == 'blum-dev'
+
+- include: add_extra_routes.yml
+  vars:
+    subnets:
+      - 244
+      - 250
+  become: yes
+  when: inventory_hostname == 'blum-prod'
+
+- include: server_configuration_update.yml
+  become: yes

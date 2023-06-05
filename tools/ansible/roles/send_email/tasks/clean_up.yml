@@ -1,0 +1,19 @@
+
+---
+- name: Recursively remove server tmp directory
+  file:
+    path: "/tmp/{{ server_tmp_dir }}"
+    state: absent
+
+- name: Remove passwords from txt files
+  lineinfile: 
+    dest: "/home/spryker-admin/jenkins/{{ item.item | replace('.','_') }}.txt"
+    state: absent 
+    regexp: "^Password"
+  when: (jenkins_users_check is defined) and (item.stat.exists == false)
+  loop: "{{ jenkins_users_check.results }}"
+
+- name: Recursively remove jenkins tmp directory
+  file:
+    path: "/tmp/jenkins-auth/"
+    state: absent

@@ -1,0 +1,40 @@
+---
+- name: Read the common.hcl file
+  slurp:
+    src: "{{ DIR }}/config/common/spryker.hcl"
+  register: common_hcl_data
+
+# - debug:
+#     msg: "{{ (common_hcl_data.content | b64decode).split('\n') }}"
+
+- name: Process the common.hcl data
+  set_fact:
+    common_hcl_content: "{{ (common_hcl_data.content | b64decode).split('\n') }}"
+
+- name: Extract customer_name, customer_project, and environment_name
+  set_fact:
+    customer_name: "{{ item.split('=')[-1].strip().strip('\"') }}"
+  loop: "{{ common_hcl_content }}"
+  when: "{{ 'project_owner' in item }}"
+  register: customer_name_result
+
+- name: Extract customer_project
+  set_fact:
+    customer_project: "{{ item.split('=')[-1].strip().strip('\"') }}"
+  loop: "{{ common_hcl_content }}"
+  when: "{{ 'customer_project' in item }}"
+  register: customer_project_result
+
+- name: Extract environment_name
+  set_fact:
+    environment_name: "{{ item.split('=')[-1].strip().strip('\"') }}"
+  loop: "{{ common_hcl_content }}"
+  when: "{{ 'env_type' in item }}"
+  register: environment_name_result
+
+- name: Set extracted names as facts
+  set_fact:
+    customer_name: "{{ customer_name_result.results | selectattr('ansible_facts.customer_name', 'defined') | map(attribute='ansible_facts.customer_name') | first }}"
+    customer_project: "{{ customer_project_result.results | selectattr('ansible_facts.customer_project', 'defined') | map(attribute='ansible_facts.customer_project') | first }}"
+    environment_name: "{{ environment_name_result.results | selectattr('ansible_facts.environment_name', 'defined') | map(attribute='ansible_facts.environment_name') | first }}"
+

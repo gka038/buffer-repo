@@ -1,0 +1,14 @@
+---
+- name: Get bastion config from the vault
+  set_fact:
+    bastions_list: "{{ lookup('hashi_vault', 'return_format=values secret=cloud/data/bastion/vpn/' + 'shared_list')  | default({}) }},
+                    {{ lookup('hashi_vault', 'return_format=values secret=cloud/data/bastion/vpn/' + inventory_hostname, errors='warn') | default({}) }}"
+
+- name: Create vpn users list
+  set_fact:
+    vpn_users: "{{ bastions_list| replace(' ', '') | split(',') | select() | unique }}"
+
+- name: Get users emails
+  set_fact:
+    users_emails: "{{ users_emails| default({})| combine ({ item: lookup('hashi_vault', 'secret=cloud/data/users/' + item )['email']} | default({})) }}"
+  with_items: "{{ vpn_users }}"

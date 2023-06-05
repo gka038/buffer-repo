@@ -1,0 +1,24 @@
+---
+- name: Create a base hosts file
+  local_action:
+    module: copy
+    dest: "{{playbook_dir}}/bastion-hosts"
+    content: |
+      [bastion]
+
+      [bastion:vars]
+      ansible_user=spryker-admin
+      ansible_port=22
+
+- name: Get ENV config
+  set_fact:
+    env_conf: "{{ env_conf|default({}) | combine({ item: lookup('community.hashi_vault.vault_read', 'openvpn-ip/data/bastions/' + item).data }) }}"
+  with_items: "{{ query('community.hashi_vault.vault_list', 'openvpn-ip/metadata/bastions')[0].data['keys'] }}"
+
+- name: Add ENV to the hosts file
+  local_action:
+    module: lineinfile
+    dest: "{{playbook_dir}}/bastion-hosts"
+    insertafter: '\[bastion\]'
+    line: "{{ item.key }} ansible_ssh_host={{ item.value['data']['ip'] }} EASYRSA_CERT_EXPIRE={{ item.value['data']['EASYRSA_CERT_EXPIRE'] | default(default_easyrsa_cert_expire) }} vpn_inactivity_timeout={{ item.value['vpn_inactivity_timeout'] | default(default_vpn_inactivity_timeout) }}"
+  with_items: "{{ env_conf | dict2items }}"

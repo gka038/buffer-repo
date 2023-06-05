@@ -1,0 +1,41 @@
+---
+- name: Get installed certificates
+  shell: grep ^V /root/pki/index.txt | awk -F '=' '{print $2}' | grep -v "{{ index_filter }}"
+  register: vpn_users_list
+  become: yes
+
+- name: OVPN Revoke user certificate
+  shell: "{{easy_rsa_dir}}/easyrsa --batch revoke {{ item }}"
+  loop: "{{vpn_users_list.stdout_lines}}"
+  when: item not in vpn_users
+  environment:
+    EASYRSA_PKI: "{{EASYRSA_PKI}}"
+  register: gen_crl
+  become: yes
+
+- name: OVPN Generate CRL
+  shell: "{{easy_rsa_dir}}/easyrsa gen-crl"
+  environment:
+    EASYRSA_PKI: "{{EASYRSA_PKI}}"
+  when: gen_crl.changed == true
+  become: yes
+
+- name: copy CRL
+  copy:
+    src: "{{EASYRSA_PKI}}/crl.pem"
+    dest: /etc/openvpn/certs/crl.pem
+    remote_src: yes
+    owner: nobody
+    mode: '0600'
+  when: gen_crl.changed == true
+
+- name: Ensure that crl-verify is enabled
+  lineinfile:
+    path: /etc/openvpn/server/server.conf
+    state: present
+    regexp: '^crl-verify'
+    line: "crl-verify /etc/openvpn/certs/crl.pem"
+  when: gen_crl.changed == true
+  notify:
+    - Restart OVPN
+  become: yes

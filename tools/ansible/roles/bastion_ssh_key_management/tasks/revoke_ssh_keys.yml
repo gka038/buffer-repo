@@ -1,0 +1,62 @@
+---
+- name: Check if user authorized_keys file exists
+  stat:
+    path: "/home/{{ item }}/.ssh/authorized_keys"
+  register: existing_keys_files
+  with_items:
+    - "{{ ssh_users }}"
+
+- name: Get installed keys
+  shell: grep ^ssh- /home/{{ item.item }}/.ssh/authorized_keys
+  register: inistalled_user_keys
+  loop: "{{ existing_keys_files.results }}"
+  when: item.stat.exists == true
+  become: yes
+
+- name: Prepare desired users keys list
+  set_fact:
+    users_list_d: |
+      {% set res = [] -%}
+      {% for host_name in ssh_list -%}
+      {% set tmp_u = [] -%}
+      {% for host_user_name in host_name -%}
+      {% set tmp_k = [] -%}
+      {% for ssh_user_name in host_name[host_user_name]| replace(' ', '')| split(',') -%}
+      {% set ignored_tmp_k = tmp_k.extend([ ssh_keys_list[ssh_user_name] ]) -%}
+      {%- endfor %}
+      {% set ignored_tmp_u = tmp_u.extend([{host_user_name: tmp_k}]) -%}
+      {%- endfor %}
+      {% set ignored = res.extend([tmp_u]) -%}
+      {%- endfor %}
+      {{ res }}
+
+- name: Combine bastion and shared lists
+  set_fact:
+    desired_users_keys_list: "{{ users_list_d.0 | combine(users_list_d.1 | default([]), list_merge='prepend_rp') }}"
+
+- name: Create revoke keys list
+  set_fact:
+    revoke_keys: |
+      {% set res = [] -%}
+      {% for user_keys in inistalled_user_keys.results -%}
+      {%- if user_keys.stdout_lines is defined -%}
+      {% for key in user_keys.stdout_lines -%}
+      {% for d_user_keys in desired_users_keys_list -%}
+      {%- if d_user_keys == user_keys.item.item -%}
+      {%- if key is not in desired_users_keys_list[d_user_keys] -%}
+      {% set ignored = res.extend([{ 'user_name': user_keys.item.item,  "user_key": key }]) -%}
+      {% endif %}
+      {% endif %}
+      {%- endfor %}
+      {%- endfor %}
+      {% endif %}
+      {%- endfor %}
+      {{ res }}
+
+- name: Revoke authorized keys
+  authorized_key:
+    user: "{{item.user_name}}"
+    state: absent
+    key: "{{item.user_key}}"
+  loop: "{{ revoke_keys}}"
+  become: yes

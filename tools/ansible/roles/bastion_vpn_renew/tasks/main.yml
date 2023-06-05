@@ -1,0 +1,9 @@
+---
+- include: check_vpn_user_exists.yml
+  become: yes
+
+- include: revoke_ovpn_users.yml
+  become: yes
+
+- include: add_ovpn_user.yml
+  become: yes

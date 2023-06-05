@@ -1,0 +1,10 @@
+---
+- name: Set OpenVPN inactivity timeout
+  lineinfile:
+    path: /etc/openvpn/server/server.conf
+    state: present
+    regexp: 'inactive'
+    line: 'push "inactive {{vpn_inactivity_timeout}}"'
+  notify:
+    - Restart OVPN srv
+  become: yes

@@ -1,0 +1,32 @@
+---
+# VPN
+EASYRSA_PKI: /root/pki
+default_easyrsa_cert_expire: 365
+easy_rsa_dir: /root/EasyRSA-3.0.7
+vpn_script_update: True
+default_vpn_inactivity_timeout: 3600
+index_filter: 'server\|--'
+
+# backup
+ssh_users:
+  - ubuntu
+  - spryker-admin
+  - sftpuser
+openvpn_dirs:
+  - /root/pki
+  - /etc/openvpn/certs
+backup_dir: backup
+server_tmp_dir: user_conf
+local_tmp_dir: /tmp/
+script_folder: /opt/
+script_name: vpn_add_user.sh
+
+# mail
+mail_from: noreply@spryker.com
+mail_from_team: "(Spryker Cloud Operations team)"
+SMTP_SERVER: email-smtp.eu-central-1.amazonaws.com
+
+# vault
+VAULT_URL: https://vault.spryker.systems
+VAULT_PORT: 8200
+VAULT_RO_BOT_USERNAME: andible-cloud-bot-ro

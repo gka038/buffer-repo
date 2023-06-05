@@ -1,0 +1,7 @@
+---
+- name: Set up authorized keys
+  authorized_key:
+    user: "{{item.host_user}}"
+    state: present
+    key: "{{item.user_key}}"
+  loop: "{{ ssh_users_keys }}"

@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    ansible_playbooks:
+      - main.yml
+      - add_ssh_keys.yml
+      - revoke_ssh_keys.yml
+    vault_folder: "ec2"
+  roles:
+    - extract-names
+    - vault_ssh
+    - ec2_ssh_key_management

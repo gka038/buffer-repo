@@ -1,0 +1,10 @@
+---
+- name: Recursively remove server backup directory
+  file:
+    path: "/tmp/{{ backup_dir }}"
+    state: absent
+
+- name: Remove server backup archive
+  file:
+    path: "/tmp/{{ inventory_hostname }}_{{ backup_dir }}_{{ current_date }}.tar.gz"
+    state: absent

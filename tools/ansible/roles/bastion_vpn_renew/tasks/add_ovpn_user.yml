@@ -1,0 +1,12 @@
+---
+- name: Create server tmp directory if it does not exist
+  file:
+    path: "/tmp/{{ server_tmp_dir }}"
+    state: directory
+    mode: '0755'
+  when:  gen_crl.changed == true
+
+- name: Adding OVPN users
+  command: "{{ script_folder }}/{{script_name}} {{ item.item }}"
+  when: item.stat.exists == false
+  loop: "{{vpn_certs_check_revoked.results}}"

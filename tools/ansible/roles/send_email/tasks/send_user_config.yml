@@ -1,0 +1,44 @@
+---
+- name: Include email template
+  include_vars:
+    file: templates/vpn_config_email.yml
+    name: email_template
+  when: (vpn_certs_check is defined) and (item.stat.exists == false)
+  loop: "{{ vpn_certs_check.results }}"
+
+- name: Sending config e-mail
+  mail:
+    host: "{{ SMTP_SERVER }}"
+    port: 465
+    from: "{{ mail_from }} (Spryker Cloud Operations team)"
+    username: "{{ SMTP_USER }}"
+    password: "{{ SMTP_PASS }}"
+    to:  "{{users_emails[item.item]}}"
+    subject: "OVPN configuration for {{ inventory_hostname }}"
+    body: "{{ email_template['email_template'] }}"
+    attach:
+      - "/tmp/{{ server_tmp_dir }}/{{ item.item }}-{{ inventory_hostname }}.tar.gz"
+  when: (vpn_certs_check is defined) and (item.stat.exists == false)
+  loop: "{{ vpn_certs_check.results }}"
+
+- name: Include Jenkins config email template
+  include_vars:
+    file: templates/jenkins_config_email.yml
+    name: jenkins_email_template
+  when: (jenkins_users_check is defined) and (item.stat.exists == false)
+  loop: "{{ jenkins_users_check.results }}"
+
+- name: Sending jenkins config e-mail
+  mail:
+    host: "{{ SMTP_SERVER }}"
+    port: 465
+    from: "{{ mail_from }} (Spryker Cloud Operations team)"
+    username: "{{ SMTP_USER }}"
+    password: "{{ SMTP_PASS }}"
+    to:  "{{jenkins_users_emails[item.item]}}"
+    subject: "Jenkins credentials for {{ inventory_hostname }}"
+    body: "{{ jenkins_email_template['email_template'] }}"
+    attach:
+      - "/tmp/jenkins-auth/{{ inventory_hostname }}_{{ item.item | replace('.','_') }}.tar.gz"
+  when: (jenkins_users_check is defined) and (item.stat.exists == false)
+  loop: "{{ jenkins_users_check.results }}"

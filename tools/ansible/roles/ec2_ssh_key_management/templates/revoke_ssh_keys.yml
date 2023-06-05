@@ -1,0 +1,53 @@
+---
+- name: Check if user authorized_keys file exists
+  stat:
+    path: "/home/{{ item }}/.ssh/authorized_keys"
+  register: existing_keys_files
+  with_items: "{{ ssh_users }}"
+
+- name: Get installed keys
+  shell: grep ^ssh- /home/{{ item.item }}/.ssh/authorized_keys
+  register: inistalled_user_keys
+  loop: "{{ existing_keys_files.results }}"
+  when: item.stat.exists == true
+
+- name: Prepare desired users keys list
+  set_fact:
+    desired_users_keys_list: |
+      {% set res = [] -%}
+      {% for host_user_name in ssh_users -%}
+      {% set keys = [] -%}
+      {% for user_key in ssh_users_keys -%}
+      {%- if user_key['host_user'] == host_user_name -%}
+      {% set keys_ignored = keys.extend([user_key['user_key']]) -%}
+      {% endif %}
+      {%- endfor %}
+      {% set ignored = res.extend([{'user_name': host_user_name, 'user_keys': keys}]) -%}
+      {%- endfor %}
+      {{ res }}
+
+- name: Create revoke keys list
+  set_fact:
+    revoke_keys: |
+      {% set res = [] -%}
+      {% for user_keys in inistalled_user_keys.results -%}
+      {%- if user_keys.stdout_lines is defined -%}
+      {% for key in user_keys.stdout_lines -%}
+      {% for d_user_keys in desired_users_keys_list -%}
+      {%- if d_user_keys['user_name'] == user_keys.item.item -%}
+      {%- if key is not in d_user_keys['user_keys'] -%}
+      {% set ignored = res.extend([{ 'user_name': user_keys.item.item,  "user_key": key }]) -%}
+      {% endif %}
+      {% endif %}
+      {%- endfor %}
+      {%- endfor %}
+      {% endif %}
+      {%- endfor %}
+      {{ res }}
+
+- name: Revoke authorized keys
+  authorized_key:
+    user: "{{item.user_name}}"
+    state: absent
+    key: "{{item.user_key}}"
+  loop: "{{ revoke_keys}}"

@@ -1,0 +1,9 @@
+email_template: |
+  Hello,
+
+  The attachment of this email contains necessary configuration which you need to connect to the "{{ inventory_hostname }}" Jenkins webUI.
+  The file in the attachment contains your username and the password to access jenkins - http://{{ jenksin_domain }}
+
+  --
+  Kind Regards
+  Spryker Cloud Operations team

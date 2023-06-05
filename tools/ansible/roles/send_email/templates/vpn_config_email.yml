@@ -1,0 +1,33 @@
+email_template: |
+  Hello,
+
+  The attachment of this email contains necessary configuration which you need to connect to the "{{ inventory_hostname }}" network.
+
+  ==== Windows configuration ======
+  OpenVPN configuration steps:
+  1. Extract your personal configuration archive somewhere on your PC.
+  2. Install Openvpn client: https://openvpn.net/vpn-server-resources/installation-guide-for-openvpn-connect-client-on-windows/
+  3. Import configuration:  https://community.openvpn.net/openvpn/wiki/OpenVPN-GUI-New#gui-import
+
+  ==== MAC configuration ======
+  OpenVPN configuration steps:
+  1. Install Tunnelblick OpenVPN client https://tunnelblick.net/downloads.html
+  2. Extract your personal configuration archive somewhere on your PC.
+  3. Open Tunnelblick and the folder with configuration and drag-and-drop the configuration file to Tunnelblick configuration area.
+
+  ==== Linux configuration ======
+  OpenVPN configuration steps:
+  1. Install OpenVPN and extension for the network manager: "sudo apt install openvpn network-manager-openvpn network-manager-openvpn-gnome"
+  2. Restart NetworkManager service: "sudo service network-manager restart"
+  3. Open Settings → Network 
+  4. Click on the + sign to add a connection
+  5. Click on Import from file
+  6. Navigate to the config file, and double-click on it
+  7. Click on the Add button 
+  8. Go to the settings of this VPN connection and tick the "Use this connection only for resources on its network" for both IPv4 and IPv6 tabs.
+
+  Now you could connect to the "{{ inventory_hostname }}" OpenVPN Server.
+
+  --
+  Kind Regards
+  Spryker Cloud Operations team

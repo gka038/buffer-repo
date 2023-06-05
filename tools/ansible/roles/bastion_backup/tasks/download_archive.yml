@@ -1,0 +1,12 @@
+---
+- name: Archive backup directory
+  archive:
+    path: "/tmp/{{ backup_dir }}"
+    dest: "/tmp/{{ inventory_hostname }}_{{ backup_dir }}_{{ current_date }}.tar.gz"
+    format: gz
+
+- name: Store backup into local tmp directory
+  fetch:
+    src: "/tmp/{{ inventory_hostname }}_{{ backup_dir }}_{{ current_date }}.tar.gz"
+    dest: "{{ local_tmp_dir }}/{{ inventory_hostname }}_{{ backup_dir }}_{{ current_date }}.tar.gz"
+    flat: yes

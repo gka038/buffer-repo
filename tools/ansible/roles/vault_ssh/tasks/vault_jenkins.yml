@@ -1,0 +1,12 @@
+---
+- name: Get jenkins domain name
+  set_fact:
+    jenksin_domain: "{{ lookup('hashi_vault', 'secret=openvpn-ip/data/bastions/' + inventory_hostname, errors='warn')['jenkins-host'] | default('no-config', true)}}"
+
+- name: Get jenkins admin user
+  set_fact:
+    jenksin_admin_user: "{{ lookup('hashi_vault', 'secret=openvpn-ip/data/bastions/' + inventory_hostname, errors='warn')['jenkins-admin-user'] | default('no-config', true)}}"
+
+- name: Get jenkins admin password
+  set_fact:
+    jenksin_admin_pass: "{{ lookup('hashi_vault', 'secret=openvpn-ip/data/bastions/' + inventory_hostname, errors='warn')['jenkins-admin-pass'] | default('no-config', true)}}"

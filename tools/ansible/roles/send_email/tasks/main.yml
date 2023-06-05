@@ -1,0 +1,6 @@
+---
+- include: send_user_config.yml
+  become: yes
+
+- include: clean_up.yml
+  become: yes
