@@ -1,0 +1,29 @@
+terraform {
+  required_version = ">= 1.0.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "${provider_version_constraints.aws}"
+    }
+    vault = {
+      source  = "hashicorp/vault"
+      version = "${provider_version_constraints.vault}"
+    }
+  }
+}
+
+provider "aws" {
+  region = "${provider_parameters.aws_region}"
+  default_tags {
+      tags = {
+        aws_account_id          = "${provider_parameters.aws_account_id}"
+        customer_name           = "${provider_parameters.customer_name}"
+        customer_project        = "${provider_parameters.customer_project}"
+        release_version         = "${provider_parameters.release_version}"
+      }
+    }
+}
+
+provider "vault" {
+  address = "https://vault.spryker.systems:8200"
+}

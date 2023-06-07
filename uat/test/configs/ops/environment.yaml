@@ -1,0 +1,7 @@
+kind: environment
+environment:
+  - reference: "e2ecustomer"
+    environment_template: "production.vault"
+    tier: M
+    landing_zone: "e2ecustomer"
+    tags: [ "production", "us", "wave3", "wave4" ]

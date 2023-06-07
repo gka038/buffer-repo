@@ -1,0 +1,16 @@
+locals {
+  iam_users = [
+    {% if users | length %}
+    {% for user in users.items() %}
+    {% for role in user.roles.items() %}
+    {
+        name        = "{{ user.email }}"
+        email       = "{{ user.email }}"
+        role        = "{{ role }}"
+        environment = [{% for env in role.items() %}{{ env }}{% if not loop.last %},{% endif %}{% endfor %}]
+    } {% if not loop.last %},{% endif %}
+    {% endfor %}
+    {% endfor %}
+    {% endif %}
+  ]
+}

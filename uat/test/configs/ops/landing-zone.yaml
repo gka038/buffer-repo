@@ -1,0 +1,12 @@
+version: 1.0
+kind: landing_zone
+landing_zone:
+
+  - reference: e2ecustomer
+    aws_account_id: 212448369814
+    region: us-east-1
+    policies:
+      - production
+    tags:
+      - production
+      - us

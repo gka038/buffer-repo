@@ -1,0 +1,76 @@
+locals {
+  spryker_environment = {
+    yves = {
+      APPLICATION_ENV = "docker.dev"
+      SPRYKER_ZED_SSL_ENABLED = "1"
+      SPRYKER_DEBUG_ENABLED = "0"
+      SPRYKER_ACTIVE_STORES = "DE,AT"
+      SPRYKER_JENKINS_CSRF_PROTECTION_ENABLED="0"
+      SPRYKER_KEY_VALUE_STORE_ENGINE = "redis"
+      SPRYKER_KEY_VALUE_STORE_CONNECTION_OPTIONS = ""
+      SPRYKER_KEY_VALUE_REGION_NAMESPACES = "{\"DE\":1,\"AT\":1}"
+      SPRYKER_SEARCH_ENGINE = "ES"
+      SPRYKER_SEARCH_INDEX_PREFIX = "example-staging"
+      SPRYKER_SESSION_FE_ENGINE = "redis"
+      SPRYKER_MAIL_SENDER_EMAIL = "no-reply@uat-e2ecustomer.cloud.spryker.toys"
+      SPRYKER_MAIL_SENDER_NAME = "Spryker No-Reply"
+
+    }
+    boffice = {
+      APPLICATION_ENV = "docker.dev"
+      SPRYKER_ZED_SSL_ENABLED = "1"
+      SPRYKER_DEBUG_ENABLED = "0"
+      SPRYKER_ACTIVE_STORES = "DE,AT"
+      SPRYKER_JENKINS_CSRF_PROTECTION_ENABLED="0"
+      SPRYKER_KEY_VALUE_STORE_ENGINE = "redis"
+      SPRYKER_KEY_VALUE_STORE_CONNECTION_OPTIONS = ""
+      SPRYKER_KEY_VALUE_REGION_NAMESPACES = "{\"DE\":1,\"AT\":1}"
+      SPRYKER_SEARCH_ENGINE = "ES"
+      SPRYKER_SEARCH_INDEX_PREFIX = "example-staging"
+      SPRYKER_SESSION_BE_ENGINE = "redis"
+      SPRYKER_DB_ENGINE = "mysql"
+      SPRYKER_DB_DATABASE = "uat_e2ecustomer"
+      SPRYKER_DB_CHARACTER_SET = "utf8"
+      SPRYKER_DB_COLLATE = "utf8_general_ci"
+      SPRYKER_BROKER_ENGINE = "rabbitmq"
+      SPRYKER_BROKER_CONNECTIONS = "{\"DE\":{\"RABBITMQ_VIRTUAL_HOST\":\"de_queue\"},\"AT\":{\"RABBITMQ_VIRTUAL_HOST\":\"at_queue\"}}"
+      SPRYKER_MAIL_SENDER_EMAIL = "no-reply@uat-e2ecustomer.cloud.spryker.toys"
+      SPRYKER_MAIL_SENDER_NAME = "Spryker No-Reply"
+    }
+    backgw = {
+      APPLICATION_ENV = "docker.dev"
+      SPRYKER_ZED_SSL_ENABLED = "1"
+      SPRYKER_DEBUG_ENABLED = "0"
+      SPRYKER_ACTIVE_STORES = "DE,AT"
+      SPRYKER_JENKINS_CSRF_PROTECTION_ENABLED="0"
+      SPRYKER_KEY_VALUE_STORE_ENGINE = "redis"
+      SPRYKER_KEY_VALUE_STORE_CONNECTION_OPTIONS = ""
+      SPRYKER_KEY_VALUE_REGION_NAMESPACES = "{\"DE\":1,\"AT\":1}"
+      SPRYKER_SEARCH_ENGINE = "ES"
+      SPRYKER_SEARCH_INDEX_PREFIX = "example-staging"
+      SPRYKER_DB_ENGINE = "mysql"
+      SPRYKER_DB_DATABASE = "uat_e2ecustomer"
+      SPRYKER_DB_CHARACTER_SET = "utf8"
+      SPRYKER_DB_COLLATE = "utf8_general_ci"
+      SPRYKER_BROKER_ENGINE = "rabbitmq"
+      SPRYKER_BROKER_CONNECTIONS = "{\"DE\":{\"RABBITMQ_VIRTUAL_HOST\":\"de_queue\"},\"AT\":{\"RABBITMQ_VIRTUAL_HOST\":\"at_queue\"}}"
+      SPRYKER_MAIL_SENDER_EMAIL = "no-reply@uat-e2ecustomer.cloud.spryker.toys"
+      SPRYKER_MAIL_SENDER_NAME = "Spryker No-Reply"
+    }
+    glue = {
+      APPLICATION_ENV = "docker.dev"
+      SPRYKER_ZED_SSL_ENABLED = "1"
+      SPRYKER_DEBUG_ENABLED = "0"
+      SPRYKER_ACTIVE_STORES = "DE,AT"
+      SPRYKER_JENKINS_CSRF_PROTECTION_ENABLED="0"
+      SPRYKER_KEY_VALUE_STORE_ENGINE = "redis"
+      SPRYKER_KEY_VALUE_STORE_CONNECTION_OPTIONS = ""
+      SPRYKER_KEY_VALUE_REGION_NAMESPACES = "{\"DE\":1,\"AT\":1}"
+      SPRYKER_SEARCH_ENGINE = "ES"
+      SPRYKER_SEARCH_INDEX_PREFIX = "example-staging"
+      SPRYKER_MAIL_SENDER_EMAIL = "no-reply@uat-e2ecustomer.cloud.spryker.toys"
+      SPRYKER_MAIL_SENDER_NAME = "Spryker No-Reply"
+
+    }
+  }
+}
