@@ -1,8 +1,0 @@
-locals {
-  waf_enabled                              = {{ waf_enabled | custom_default(false) | lower }}
-  managed_sqli_ruleset                     = {{ managed_sqli_ruleset | custom_default(true) | lower }}
-  cloudwatch_metrics_enabled               = {{ cloudwatch_metrics_enabled | custom_default(false) | lower }}
-  common_custom_exclusion                  = {{ common_custom_exclusion | custom_default([]) }}
-  negated_scopedown_sqli_ruleset           = {{ negated_scopedown_sqli_ruleset | custom_default([]) }}
-  regex_scopedown_admin_protection_ruleset = {{ regex_scopedown_admin_protection_ruleset | custom_default([]) }}
-}

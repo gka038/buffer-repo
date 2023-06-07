@@ -1,8 +1,0 @@
-version: 1.0
-kind: environment_template
-environment_template:
-   reference: production.vault
-   project_repo: suite-nonsplit
-   project_branch: uat-e2e
-   infra_version: development
-   
