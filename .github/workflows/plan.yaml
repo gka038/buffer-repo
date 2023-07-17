@@ -11,6 +11,10 @@ jobs:
     steps:
       - name: Check if PR is open
         run: |
+            echo "${{ github.event }}"
+            echo "${{ github.event.issue }}"
+            echo "${{ github.event.issue.pull_request }}"
+            echo "${{ github.event.issue.pull_request.url }}"
             if [ "${{ github.event.issue.pull_request.state }}" != "open" ]; then
                 echo "PR is not open. Skipping workflow."
                 exit 1
