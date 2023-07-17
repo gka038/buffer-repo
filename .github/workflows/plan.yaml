@@ -7,14 +7,14 @@ on:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    if: github.event.issue.pull_request && contains(github.event.comment.body, 'gautam-plan')
+    if: github.event.issue.pull_request && github.event.issue.state == 'open' && contains(github.event.comment.body, 'gautam-plan')
     steps:
-      - name: Check if PR is open
-        run: |
-            if [ "${{ github.event.issue.state }}" != "open" ]; then
-                echo "PR is not open. Skipping workflow."
-                exit 1
-            fi
+    #   - name: Check if PR is open
+    #     run: |
+    #         if [ "${{ github.event.issue.state }}" != "open" ]; then
+    #             echo "PR is not open. Skipping workflow."
+    #             exit 1
+    #         fi
 
       - name: Comment Runner logs location
         uses: actions/github-script@v3 
