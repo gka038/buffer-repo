@@ -43,7 +43,7 @@ jobs:
             }
             try{ 
               const result = await github.actions.listWorkflowRunsForRepo(request)
-              console.log(JSON.stringify(result.data, null, 2));
+              console.log(JSON.stringify(result.data.workflow_runs, null, 2));
             }catch (err){
               console.log("Error : ", err)
               core.setFailed(`Request failed with error ${err}`)
