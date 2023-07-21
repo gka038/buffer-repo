@@ -36,12 +36,18 @@ jobs:
         uses: actions/github-script@v3 
         with:
           script: | 
-            const { data } = await github.actions.listWorkflowRuns({
+            const request = {
               owner: context.repo.owner,
               repo: context.repo.repo,
               status: 'in_progress'
-            });
-            console.log(JSON.stringify(data, null, 2));
+            }
+            try{ 
+              const result = await github.actions.listWorkflowRuns(request)
+              console.log(result.data)
+            }catch (err){
+              console.log("Error : ", err)
+              core.setFailed(`Request failed with error ${err}`)
+            }
       
       - name: Run sleep plan 
         shell: bash
