@@ -9,22 +9,42 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.issue.pull_request && github.event.issue.state == 'open' && contains(github.event.comment.body, 'gautam-plan')
     steps:
-    #   - name: Check if PR is open
-    #     run: |
-    #         if [ "${{ github.event.issue.state }}" != "open" ]; then
-    #             echo "PR is not open. Skipping workflow."
-    #             exit 1
-    #         fi
+      - name: Run sleep plan 
+        shell: bash
+        run: |
+          echo "Action is starting"
 
+
+      - name: Run sleep plan 
+        shell: bash
+        run: |
+          sleep 100
+      
       - name: Comment Runner logs location
         uses: actions/github-script@v3 
         with:
           script: |
-            const commentBody = '**gautam-plan is in running.. \nTo see realtime logs of Plan visit** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+            const commentBody = '**gautam-plan is in progress.. \nTo see realtime logs of Plan visit** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
             await github.issues.createComment({
               owner:  context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
               body: commentBody
             });
+
+      - name: Get running Actions list
+        uses: actions/github-script@v3 
+        with:
+          script: | 
+            const { data } = await github.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              status: 'in_progress'
+            });
+            console.log(JSON.stringify(data, null, 2));
+      
+      - name: Run sleep plan 
+        shell: bash
+        run: |
+          echo "Thread is done"
             
