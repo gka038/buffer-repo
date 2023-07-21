@@ -9,43 +9,21 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.issue.pull_request && github.event.issue.state == 'open' && contains(github.event.comment.body, 'gautam-plan')
     steps:
-      - name: get current pr details 
-        uses: actions/github-script@v3
-        id: get-current-pr
-        with:
-          script: |
-            const fs = require('fs')
-            const request = {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number
-            }
-            core.info(`Getting PR #${request.pull_number} from ${request.owner}/${request.repo}`)
-            try {
-              const result = await github.pulls.get(request)
-              return result.data
-            } catch (err) {
-              fs.writeFileSync('error.log', "Error while getting current PR details");
-              core.setFailed(`Request failed with error ${err}`)
-            }
-
-      - uses: actions/checkout@v2
-        with:
-          repository: ${{ fromJSON(steps.get-current-pr.outputs.result).head.repo.full_name }}
-          ref: ${{ fromJSON(steps.get-current-pr.outputs.result).head.ref }} 
-
       - name: Run start plan 
         shell: bash
         id: initial_sha
         run: |
           echo "Action is starting"
-          echo "::set-output name=initial_sha::$(git rev-parse HEAD)"
+      
+      - name: Display PR Number
+        shell: bash
+        run: |
+          echo "Pull Request Number: ${{ github.event.issue.number }}" 
       
       - name: Get running Actions list
         uses: actions/github-script@v3 
         with:
           script: | 
-            const initial_sha = "${{ steps.initial_sha.outputs.initial_sha }}"
             const request = {
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -55,11 +33,7 @@ jobs:
             try{ 
               const result = await github.actions.listWorkflowRunsForRepo(request)
               workflows = result.data.workflow_runs
-              for (i=0;i<workflows.length;i++){
-                console.log("head_sha is :: ",workflows[i].head_sha)
-                console.log("initial_sha :: ", initial_sha)
-              }
-              // console.log(JSON.stringify(result.data.workflow_runs, null, 2));
+              console.log(JSON.stringify(result.data.workflow_runs, null, 2));
             }catch (err){
               console.log("Error : ", err)
               core.setFailed(`Request failed with error ${err}`)
