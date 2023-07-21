@@ -15,22 +15,22 @@ jobs:
           echo "Action is starting"
 
 
-      - name: Run sleep plan 
-        shell: bash
-        run: |
-          sleep 30
+      # - name: Run sleep plan 
+      #   shell: bash
+      #   run: |
+      #     sleep 30
       
-      - name: Comment Runner logs location
-        uses: actions/github-script@v3 
-        with:
-          script: |
-            const commentBody = '**gautam-plan is in progress.. \nTo see realtime logs of Plan visit** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-            await github.issues.createComment({
-              owner:  context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: commentBody
-            });
+      # - name: Comment Runner logs location
+      #   uses: actions/github-script@v3 
+      #   with:
+      #     script: |
+      #       const commentBody = '**gautam-plan is in progress.. \nTo see realtime logs of Plan visit** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+      #       await github.issues.createComment({
+      #         owner:  context.repo.owner,
+      #         repo: context.repo.repo,
+      #         issue_number: context.issue.number,
+      #         body: commentBody
+      #       });
 
       - name: Get running Actions list
         uses: actions/github-script@v3 
@@ -42,6 +42,7 @@ jobs:
               status: 'in_progress'
             }
             try{ 
+              console.log(github.actions)
               const result = await github.actions.listWorkflowRuns(request)
               console.log(result.data)
             }catch (err){
