@@ -39,12 +39,11 @@ jobs:
             const request = {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              // status: 'in_progress'
-              workflow_id: ${{ github.run_id }}
+              status: 'in_progress',
+              event: 'issue_comment'
             }
             try{ 
-              // const result = await github.actions.listWorkflowRunsForRepo(request)
-              const result = await github.actions.listWorkflowRuns(request)
+              const result = await github.actions.listWorkflowRunsForRepo(request)
               console.log(result.data)
               // console.log(JSON.stringify(result.data.workflow_runs, null, 2));
             }catch (err){
