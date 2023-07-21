@@ -15,10 +15,10 @@ jobs:
           echo "Action is starting"
 
 
-      # - name: Run sleep plan 
-      #   shell: bash
-      #   run: |
-      #     sleep 30
+      - name: Run sleep plan 
+        shell: bash
+        run: |
+          sleep 30
       
       # - name: Comment Runner logs location
       #   uses: actions/github-script@v3 
