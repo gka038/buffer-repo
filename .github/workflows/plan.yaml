@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.issue.pull_request && github.event.issue.state == 'open' && contains(github.event.comment.body, 'gautam-plan')
     steps:
-      - name: Run sleep plan 
+      - name: Run start plan 
         shell: bash
         run: |
           echo "Action is starting"
@@ -18,7 +18,7 @@ jobs:
       - name: Run sleep plan 
         shell: bash
         run: |
-          sleep 30
+          sleep 15
       
       # - name: Comment Runner logs location
       #   uses: actions/github-script@v3 
@@ -43,13 +43,18 @@ jobs:
             }
             try{ 
               const result = await github.actions.listWorkflowRunsForRepo(request)
-              console.log(result.data)
+              console.log(JSON.stringify(result.data, null, 2));
             }catch (err){
               console.log("Error : ", err)
               core.setFailed(`Request failed with error ${err}`)
             }
       
       - name: Run sleep plan 
+        shell: bash
+        run: |
+          sleep 15
+          
+      - name: Run stop job 
         shell: bash
         run: |
           echo "Thread is done"
