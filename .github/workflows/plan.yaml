@@ -42,8 +42,7 @@ jobs:
               status: 'in_progress'
             }
             try{ 
-              console.log(github.actions.listJobsForWorkflowRun.toString())
-              const result = await github.actions.listWorkflowRuns(request)
+              const result = await github.actions.listWorkflowRunsForRepo(request)
               console.log(result.data)
             }catch (err){
               console.log("Error : ", err)
